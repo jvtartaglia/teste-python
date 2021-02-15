@@ -191,12 +191,13 @@ The REST API to the example app is described below.
 
     {
         {
-            "id": 1,
-            "name": "This is a test",
-            "email": "test_email@server.com",
-            "created_at": "2021-02-15 18:22:14.087695",
-            "updated_at": "2021-02-15 18:22:40.367555"
-        },
+            "id": 7,
+            "name": "This is a child",
+            "email": "cool_mail@server.com",
+            "created_at": "2021-02-15 22:37:42.017276",
+            "updated_at": null,
+            "parent_count": 2
+        }
 
         ...
     }
