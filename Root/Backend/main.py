@@ -2,7 +2,6 @@ from app import app, db
 from models import *
 from flask import render_template, request, Response
 import json
-from datetime import datetime
 
 
 @app.route('/')
@@ -21,7 +20,7 @@ def static_page():
 def create_parent():
     body = request.get_json()
     try:
-        parent = Parent(name = body['name'], email = body['email'], created_at = datetime.utcnow)
+        parent = Parent(name = body['name'], email = body['email'])
         db.session.add(parent)
         db.session.commit()
         return Response("{'Ok':' parent created sucessfully'}", status = 201, mimetype = 'application/json')
@@ -34,7 +33,7 @@ def create_parent():
 def create_child():
     body = request.get_json()
     try:
-        child = Child(name = body['name'], email = body['email'], created_at = datetime.utcnow)
+        child = Child(name = body['name'], email = body['email'])
         db.session.add(child)
         db.session.commit()
         return Response("{'Ok':' child created sucessfully'}", status = 201, mimetype = 'application/json')
@@ -47,14 +46,14 @@ def create_child():
 def get_parent(id):
     parent_object = Parent.query.filter_by(id = id).first()
     parent_id_json = parent_object.to_json()
-    return Response(json.dumps(parent_id_json, default = str, indent=4))
+    return Response(json.dumps(parent_id_json, default = str, indent = 4))
 
 
 @app.route('/api/child/<id>', methods = ['GET'])
 def get_child(id):
     child_object = Child.query.filter_by(id = id).first()
     child_id_json = child_object.to_json()
-    return Response(json.dumps(child_id_json, default = str, indent=4))
+    return Response(json.dumps(child_id_json, default = str, indent = 4))
 
 
 @app.route('/api/parent/<id>', methods = ['PUT'])
@@ -124,14 +123,14 @@ def delete_child(id):
 def get_parents():
     parents_object = Parent.query.all()
     parents_json = [parent.to_json() for parent in parents_object]
-    return Response(json.dumps(parents_json, default = str, indent=4))
+    return Response(json.dumps(parents_json, default = str, indent = 4))
 
 
 @app.route('/api/children', methods = ['GET'])
 def get_children():
     children_object = Child.query.all()
     children_json = [child.to_json() for child in children_object]
-    return Response(json.dumps(children_json, default = str, indent=4))
+    return Response(json.dumps(children_json, default = str, indent = 4))
 
 # TODO
 # testar mesma rota com e sem argumento
@@ -142,7 +141,7 @@ def get_children():
 #     count = request.args['children']
 #     parents_object = Parent.query.filter_by(count = count)
 #     parents_json = [parent.to_json() for parent in parents_object]
-#     return Response(json.dumps(parents_json, default = str, indent=4))
+#     return Response(json.dumps(parents_json, default = str, indent = 4))
     
     
 # @app.route('/children', methods = ['GET'])
@@ -150,7 +149,7 @@ def get_children():
 #     count = request.args['parents']
 #     children_object = Child.query.filter_by(count = count)
 #     children_json = [child.to_json() for child in children_object]
-#     return Response(json.dumps(children_json, default = str, indent=4))
+#     return Response(json.dumps(children_json, default = str, indent = 4))
 
 
 if __name__ == '__main__':
