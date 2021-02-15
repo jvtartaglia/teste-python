@@ -1,8 +1,9 @@
 from app import app, db
 from models import *
-from sql_query import parent_sql_query, child_sql_query
+from utils import parent_sql_query, child_sql_query, parents_json_parser, children_json_parser
 from flask import render_template, request, Response
 import json
+import werkzeug
 
 
 @app.route('/')
@@ -141,39 +142,56 @@ def delete_child(id):
 
 
 @app.route('/api/parents', methods = ['GET'])
-def get_parents():
-    parents_object = Parent.query.all()
-    parents_json = [parent.to_json() for parent in parents_object]
-    return Response(json.dumps(parents_json, default = str, indent = 4), status = 200)
+def get_parents_count():
+    try:
+        count_param = request.args['children']
+        count_param_int = int(count_param)
+        result = []
+        query = db.engine.execute(parent_sql_query(count_param_int))
+        for item in query:
+            result.append(item)
+        query.close()
+        return Response(parents_json_parser(result), status = 200)
+    
+    except werkzeug.exceptions.BadRequest as e:
+        parents_object = Parent.query.all()
+        parents_json = [parent.to_json() for parent in parents_object]
+        return Response(json.dumps(parents_json, default = str, indent = 4), status = 200)
+
+    except ValueError as e:
+        print(e)
+        return Response("{'Bad request':'child argument not integer'}", status = 400, mimetype = 'application/json')
+
+    except Exception as e:
+        print(e)
+        return Response(status = 400)
 
 
 @app.route('/api/children', methods = ['GET'])
-def get_children():
-    children_object = Child.query.all()
-    children_json = [child.to_json() for child in children_object]
-    return Response(json.dumps(children_json, default = str, indent = 4), status = 200)
-
-# TODO
-# testar mesma rota com e sem argumento
-# contar ocorrencias no bd
-
-@app.route('/parents', methods = ['GET'])
-def get_parents_count():
-    count = request.args['children']
-    query_result = db.engine.execute(parent_sql_query(count))
-    print(query_result)
-    # parents_object = Parent.query.filter_by(count = count)
-    # parents_json = [parent.to_json() for parent in parents_object]
-    # return Response(json.dumps(parents_json, default = str, indent = 4))
+def get_children_count():
+    try:
+        count_param = request.args['parents']
+        count_param_int = int(count_param)
+        result = []
+        query = db.engine.execute(child_sql_query(count_param_int))
+        for item in query:
+            result.append(item)
+        query.close()
+        return Response(children_json_parser(result), status = 200)
     
-    
-# @app.route('/children', methods = ['GET'])
-# def get_children_count():
-#     count = request.args['parents']
-#     children_object = Child.query.filter_by(count = count)
-#     children_json = [child.to_json() for child in children_object]
-#     return Response(json.dumps(children_json, default = str, indent = 4))
+    except werkzeug.exceptions.BadRequest as e:
+        children_object = Child.query.all()
+        children_json = [child.to_json() for child in children_object]
+        return Response(json.dumps(children_json, default = str, indent = 4), status = 200)
 
+    except ValueError as e:
+        print(e)
+        return Response("{'Bad request':'parents argument not integer'}", status = 400, mimetype = 'application/json')
+
+    except Exception as e:
+        print(e)
+        return Response(status = 400)
+    
 
 if __name__ == '__main__':
     app.run(debug=True)

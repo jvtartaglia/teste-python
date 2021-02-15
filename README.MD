@@ -172,6 +172,34 @@ The REST API to the example app is described below.
         }
     }
 
+## Get by count
+
+### Request
+
+`GET /api/parents?children=<integer>` 
+
+`GET /api/children?parents=<integer>`
+
+
+### Response
+
+    HTTP/1.1 200 OK
+    Content-Type: text/html; charset=utf-8
+    Content-Length: 386
+    Server: Werkzeug/1.0.1 Python/3.9.1
+    Date: Mon, 15 Feb 2021 13:38:12 GMT
+
+    {
+        {
+            "id": 1,
+            "name": "This is a test",
+            "email": "test_email@server.com",
+            "created_at": "2021-02-15 18:22:14.087695",
+            "updated_at": "2021-02-15 18:22:40.367555"
+        },
+
+        ...
+    }
 
 ## Delete
 
