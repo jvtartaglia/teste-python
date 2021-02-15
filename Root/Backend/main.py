@@ -2,6 +2,7 @@ from app import app, db
 from models import *
 from flask import render_template, request, Response
 import json
+from datetime import datetime
 
 
 @app.route('/')
@@ -20,7 +21,7 @@ def static_page():
 def create_parent():
     body = request.get_json()
     try:
-        parent = Parent(name = body['name'], email = body['email'])
+        parent = Parent(name = body['name'], email = body['email'], created_at = datetime.utcnow)
         db.session.add(parent)
         db.session.commit()
         return Response("{'Ok':' parent created sucessfully'}", status = 201, mimetype = 'application/json')
@@ -33,7 +34,7 @@ def create_parent():
 def create_child():
     body = request.get_json()
     try:
-        child = Child(name = body['name'], email = body['email'])
+        child = Child(name = body['name'], email = body['email'], created_at = datetime.utcnow)
         db.session.add(child)
         db.session.commit()
         return Response("{'Ok':' child created sucessfully'}", status = 201, mimetype = 'application/json')
@@ -55,8 +56,6 @@ def get_child(id):
     child_id_json = child_object.to_json()
     return Response(json.dumps(child_id_json, default = str, indent=4))
 
-# TODO
-# created_at timestamp
 
 @app.route('/api/parent/<id>', methods = ['PUT'])
 def update_parent(id):
