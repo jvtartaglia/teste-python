@@ -1,4 +1,4 @@
-from app import db
+from app import db  
 from sqlalchemy.sql import func
 
 association_table = db.Table('association', db.Model.metadata,

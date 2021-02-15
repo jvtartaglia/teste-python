@@ -47,7 +47,37 @@ The REST API to the example app is described below.
 
     {
         "name": "Test",
-        "email": "test@email.com"
+        "email": "test@email.com",
+    }
+
+### Response
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Content-Length: 35
+    Server: Werkzeug/1.0.1 Python/3.9.1
+    Date: Mon, 15 Feb 2021 13:30:38 GMT
+
+    {'Ok':' child/parent created sucessfully'}
+
+## Create with relationship
+
+### Request
+
+`POST /api/parent`
+
+    {
+        "name": "Test",
+        "email": "test@email.com",
+        "child_id": [1, 2, 3, ...]
+    }
+
+`POST /api/child`
+
+    {
+        "name": "Test",
+        "email": "test@email.com",
+        "parent_id": [1, 2]
     }
 
 ### Response
@@ -102,6 +132,14 @@ The REST API to the example app is described below.
     Date: Mon, 15 Feb 2021 13:38:12 GMT
 
     {
+        {
+            "id": 1,
+            "name": "This is a test",
+            "email": "test_email@server.com",
+            "created_at": "2021-02-15 18:22:14.087695",
+            "updated_at": "2021-02-15 18:22:40.367555"
+        },
+
         ...
     }
 
@@ -125,7 +163,13 @@ The REST API to the example app is described below.
     Date: Mon, 15 Feb 2021 13:40:27 GMT
 
     {
-        ...
+        {
+            "id": 6,
+            "name": "Some Child",
+            "email": "some_child@email.com",
+            "created_at": "2021-02-15 18:17:25.820599",
+            "updated_at": "2021-02-15 18:18:44.726464"
+        }
     }
 
 

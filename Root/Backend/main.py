@@ -13,8 +13,6 @@ def index():
 def static_page():
     return render_template('static.html')
 
-# TODO
-# especificar a relacao durante o post
 
 @app.route('/api/parent', methods = ['POST'])
 def create_parent():
@@ -22,8 +20,18 @@ def create_parent():
     try:
         parent = Parent(name = body['name'], email = body['email'])
         db.session.add(parent)
+        
+        if 'child_id' in body:
+            try:
+                for id in body['child_id']:
+                    child_object = Child.query.filter_by(id = id).first()
+                    parent.children.append(child_object)
+            except Exception as e:
+                print(e)
+                return Response("{'Bad request':'could not match child_id}", status = 400, mimetype = 'application/json')
+
         db.session.commit()
-        return Response("{'Ok':' parent created sucessfully'}", status = 201, mimetype = 'application/json')
+        return Response("{'Ok':'parent created sucessfully'}", status = 201, mimetype = 'application/json')
     except Exception as e:
         print(e)
         return Response("{'Bad request':'parent not created'}", status = 400, mimetype = 'application/json')
@@ -35,8 +43,21 @@ def create_child():
     try:
         child = Child(name = body['name'], email = body['email'])
         db.session.add(child)
+        
+        if 'parent_id' in body:
+            if len(body['parent_id']) > 2:
+                return Response("{'Bad request':'child can have maximum 2 parents'}", status = 400, mimetype = 'application/json')
+            else:
+                try:
+                    for id in body['parent_id']:
+                        parent_object = Parent.query.filter_by(id = id).first()
+                        child.parents.append(parent_object)
+                except Exception as e:
+                    print(e)
+                    return Response("{'Bad request':'could not match parent_id}", status = 400, mimetype = 'application/json')
+
         db.session.commit()
-        return Response("{'Ok':' child created sucessfully'}", status = 201, mimetype = 'application/json')
+        return Response("{'Ok':'child created sucessfully'}", status = 201, mimetype = 'application/json')
     except Exception as e:
         print(e)
         return Response("{'Bad request':'child not created'}", status = 400, mimetype = 'application/json')
@@ -46,14 +67,14 @@ def create_child():
 def get_parent(id):
     parent_object = Parent.query.filter_by(id = id).first()
     parent_id_json = parent_object.to_json()
-    return Response(json.dumps(parent_id_json, default = str, indent = 4))
+    return Response(json.dumps(parent_id_json, default = str, indent = 4), status = 200)
 
 
 @app.route('/api/child/<id>', methods = ['GET'])
 def get_child(id):
     child_object = Child.query.filter_by(id = id).first()
     child_id_json = child_object.to_json()
-    return Response(json.dumps(child_id_json, default = str, indent = 4))
+    return Response(json.dumps(child_id_json, default = str, indent = 4), status = 200)
 
 
 @app.route('/api/parent/<id>', methods = ['PUT'])
@@ -68,7 +89,7 @@ def update_parent(id):
 
         db.session.add(parent_object)
         db.session.commit()
-        return Response("{'Ok':' parent updated sucessfully'}", status = 200, mimetype = 'application/json')
+        return Response("{'Ok':'parent updated sucessfully'}", status = 200, mimetype = 'application/json')
     
     except Exception as e:
         print(e)
@@ -87,12 +108,11 @@ def update_child(id):
             
         db.session.add(child_object)
         db.session.commit()
-        return Response("{'Ok':' child updated sucessfully'}", status = 200, mimetype = 'application/json')
+        return Response("{'Ok':'child updated sucessfully'}", status = 200, mimetype = 'application/json')
     
     except Exception as e:
         print(e)
         return Response("{'Bad request':'child not updated'}", status = 400, mimetype = 'application/json')
-
 
 
 @app.route('/api/parent/<id>', methods = ['DELETE'])
@@ -101,7 +121,7 @@ def delete_parent(id):
     try:
         db.session.delete(parent_object)
         db.session.commit()
-        return Response("{'Ok':' parent deleted sucessfully'}", status = 200, mimetype = 'application/json') 
+        return Response("{'Ok':'parent deleted sucessfully'}", status = 200, mimetype = 'application/json') 
     except Exception as e:
         print(e)
         return Response("{'Bad request':'parent could not be deleted'}", status = 400, mimetype = 'application/json')
@@ -113,7 +133,7 @@ def delete_child(id):
     try:
         db.session.delete(child_object)
         db.session.commit()
-        return Response("{'Ok':' child deleted sucessfully'}", status = 200, mimetype = 'application/json') 
+        return Response("{'Ok':'child deleted sucessfully'}", status = 200, mimetype = 'application/json') 
     except Exception as e:
         print(e)
         return Response("{'Bad request':'child could not be deleted'}", status = 400, mimetype = 'application/json')
@@ -123,14 +143,14 @@ def delete_child(id):
 def get_parents():
     parents_object = Parent.query.all()
     parents_json = [parent.to_json() for parent in parents_object]
-    return Response(json.dumps(parents_json, default = str, indent = 4))
+    return Response(json.dumps(parents_json, default = str, indent = 4), status = 200)
 
 
 @app.route('/api/children', methods = ['GET'])
 def get_children():
     children_object = Child.query.all()
     children_json = [child.to_json() for child in children_object]
-    return Response(json.dumps(children_json, default = str, indent = 4))
+    return Response(json.dumps(children_json, default = str, indent = 4), status = 200)
 
 # TODO
 # testar mesma rota com e sem argumento
