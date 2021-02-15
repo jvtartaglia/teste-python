@@ -1,5 +1,6 @@
 from app import app, db
 from models import *
+from sql_query import parent_sql_query, child_sql_query
 from flask import render_template, request, Response
 import json
 
@@ -156,12 +157,14 @@ def get_children():
 # testar mesma rota com e sem argumento
 # contar ocorrencias no bd
 
-# @app.route('/parents', methods = ['GET'])
-# def get_parents_count():
-#     count = request.args['children']
-#     parents_object = Parent.query.filter_by(count = count)
-#     parents_json = [parent.to_json() for parent in parents_object]
-#     return Response(json.dumps(parents_json, default = str, indent = 4))
+@app.route('/parents', methods = ['GET'])
+def get_parents_count():
+    count = request.args['children']
+    query_result = db.engine.execute(parent_sql_query(count))
+    print(query_result)
+    # parents_object = Parent.query.filter_by(count = count)
+    # parents_json = [parent.to_json() for parent in parents_object]
+    # return Response(json.dumps(parents_json, default = str, indent = 4))
     
     
 # @app.route('/children', methods = ['GET'])
