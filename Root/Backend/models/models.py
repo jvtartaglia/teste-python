@@ -1,23 +1,25 @@
 from app import db
 from datetime import datetime
 
+association_table = db.Table('association', db.Model.metadata,
+    db.Column('parent_id', db.Integer, db.ForeignKey('Parent.id')),
+    db.Column('child_id', db.Integer, db.ForeignKey('Child.id'))
+)
+
 class Parent(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(32))
+    __tablename__ = 'Parent'
+    
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(64))
     email = db.Column(db.String(254))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default = datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default = datetime.utcnow)
 
-    children = db.Table('children',
-                           db.Column('child_id', db.Integer,
-                                     db.ForeignKey('child.id')),
-                           db.Column('parent_id', db.Integer, db.ForeignKey(
-                                     'parent.id'))
-                           )
-
-    children = db.relationship('Child', secondary=children,
-                                  lazy='dynamic',
-                                  backref=db.backref('parents', lazy='dynamic'))
+    children = db.relationship('Child', 
+                               secondary = association_table, 
+                               lazy = 'dynamic',
+                               backref = db.backref('parents', lazy = 'dynamic')
+    )   
     
     def to_json(self):
         return {
@@ -29,11 +31,13 @@ class Parent(db.Model):
         }    
     
 class Child(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(32))
+    __tablename__ = 'Child'
+    
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(64))
     email = db.Column(db.String(254))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default = datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default = datetime.utcnow)
     
     def to_json(self):
         return {
